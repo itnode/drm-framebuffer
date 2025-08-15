@@ -8,17 +8,17 @@ PROGNAME = drm-framebuffer
 exec_prefix ?= /usr
 bindir ?= $(exec_prefix)/bin
 
-all: $(OBJ)
-	$(CC) $(CFLAGS) -o $(PROGNAME) $(OBJ) $(LDFLAGS)
+all: drm-framebuffer drmfb_daemon
 
-install: all
-	install -d $(DESTDIR)$(bindir)
-	install -m 0755 $(PROGNAME) $(DESTDIR)$(bindir)
+drm-framebuffer: main.o framebuffer.o
+	$(CC) $(CFLAGS) -o drm-framebuffer main.o framebuffer.o $(LDFLAGS)
 
-clean:
-	@echo "Clean object files"
-	@rm -f $(OBJ)
-	@rm -f $(PROGNAME)
+drmfb_daemon: drmfb_daemon.c framebuffer.o
+	$(CC) $(CFLAGS) -o drmfb_daemon drmfb_daemon.c framebuffer.o $(LDFLAGS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $<
+
+clean:
+	@echo "Clean object files"
+	@rm -f *.o drm-framebuffer drmfb_daemon

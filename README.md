@@ -1,4 +1,40 @@
-# drm-framebuffer
+# drm-framebuffer & Daemon-Modus
+## Daemon-Modus (drmfb_daemon)
+
+Der Daemon empfängt Bilddaten über einen Unix Domain Socket (`/tmp/drmfb.sock`) und zeigt sie direkt auf dem Framebuffer an.
+
+### Starten
+
+```bash
+make
+./drmfb_daemon -d /dev/dri/card0 -c HDMI-A-1 &
+```
+
+### Bild senden
+
+Sende ein Raw-Bild (z.B. 1920x1080, 32bit) an den Daemon:
+
+```bash
+cat bild.raw | socat - UNIX-CONNECT:/tmp/drmfb.sock
+```
+
+### Bildformat
+
+- Erwartet werden Rohdaten (z.B. XRGB8888 oder RGBA8888, je nach DRM-Konfiguration).
+- Die Größe muss zur Auflösung des Framebuffers passen.
+
+### Beenden
+
+Beende den Daemon mit `kill <PID>` oder `pkill drmfb_daemon`.
+
+### Demo
+
+Einfarbiges Bild (z.B. rot) erzeugen und anzeigen:
+
+```bash
+python3 -c 'import sys; sys.stdout.buffer.write(b"\xff\x00\x00\xff" * (1920*1080))' > rot.raw
+cat rot.raw | socat - UNIX-CONNECT:/tmp/drmfb.sock
+```
 
 A simple drm framebuffer tool to test drm devices. It takes data from stdin and will put it to the display. 
 
